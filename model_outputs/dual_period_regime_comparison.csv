@@ -1,0 +1,11 @@
+Metric,March 2022 (Transition),September 2025 (Stable)
+Valuation Date,"March 31, 2022","September 30, 2025"
+Rate Environment,Steep upward curve,Inverted-to-humped
+24-Month MA SOFR,0.06%,4.86%
+Current SOFR,0.29%,4.34%
+Regime Excursion,+0.23% (ACTIVE),0.00% (DORMANT)
+Amplification alpha,2.0,2.0
+Mean WAL,4.61 years,4.00 years
+P05 Stable WAL,3.09 years,3.15 years
+Mean - P05 Gap,1.52 years,0.85 years
+Economic Interpretation,Surge deposits highly mobile,Hot money already fled

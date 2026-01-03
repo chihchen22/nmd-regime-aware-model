@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env/
+.venv/
+venv/
+
+# IDE / editor
+.vscode/
+.idea/
+
+# Archives and old versions (not needed for reproducibility)
+archive/
+
+# Temporary files
+~$*.docx
+~WRL*.tmp
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Paper drafts (keep final PDF only)
+Deposit-Optionality-Monte-Carlo-Refined-v3-concise.md
+Deposit-Optionality-Monte-Carlo-Refined-v3-concise.pdf
+Deposit-Optionality-Monte-Carlo-Refined-v4-humanized.md
+Deposit-Optionality-Monte-Carlo-Refined-v4-humanized.pdf
+Deposit-Optionality-Monte-Carlo-Refined-v5-convergence.md
+Deposit-Optionality-Monte-Carlo-Refined-v5-convergence.pdf
+
+# Paper generation utilities (not needed for research reproducibility)
+generate_concise_pdf.py
+figure_placement.tex
+
+# Research paper PDFs (published on SSRN)
+Beyond-Static-Bifurcation-NMD-Modeling.pdf
+BTRM-WP23-NMD-Component_Chih-Chen.pdf
+RMFI_18_2_RMFI0003_Chen.pdf
