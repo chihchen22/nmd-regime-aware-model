@@ -9,7 +9,7 @@ This repository contains the Python implementation and research outputs for the 
 Author: Chih L. Chen, BTRM, CFA, FRM  
 Date: January 2026
 
-📄 **[Read the Paper on SSRN](https://papers.ssrn.com/sol3/cf_dev/AbsByAuth.cfm?per_id=1609648)**
+📄 **[Read the Paper on SSRN](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5997414)**
 
 ---
 
