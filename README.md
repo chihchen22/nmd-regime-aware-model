@@ -1,13 +1,13 @@
-# Beyond Static Bifurcation: A Regime-Aware Approach to Nonmaturity Deposit Modeling
+# Beyond Static Assumptions: A Comprehensive Analysis of Nonmaturity Deposit Behavioral Modeling Using Market-Implied Volatility and Path-Dependent Simulation
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This repository contains the Python implementation and research outputs for the paper:
 
-**"Beyond Static Bifurcation: A Regime-Aware Approach to Nonmaturity Deposit Modeling"**
+**"Beyond Static Assumptions: A Comprehensive Analysis of Nonmaturity Deposit Behavioral Modeling Using Market-Implied Volatility and Path-Dependent Simulation"**
 
 Author: Chih L. Chen, BTRM, CFA, FRM  
-Date: January 2026
+Date: February 2026
 
 📄 **[Read the Paper on SSRN](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5997414)**
 
@@ -15,23 +15,37 @@ Date: January 2026
 
 ## Overview
 
-This framework provides a comprehensive analysis of nonmaturity deposit (NMD) behavioral dynamics using a **regime-aware component decay model**. The key innovation is the **regime amplification factor (α)** that captures how deposit sensitivity increases when current rates exceed their trailing moving average, without requiring subjective stable/non-stable bifurcation.
+This framework provides a comprehensive comparison of three distinct approaches to nonmaturity deposit (NMD) behavioral modeling, calibrated to current market conditions using the complete **SOFR cap/floor volatility surface** (October 2025). The analysis implements a **Hull-White stochastic interest rate model** for Monte Carlo simulation and quantifies embedded customer optionality that traditional static approaches systematically miss.
 
-### Key Contributions
+### Three Modeling Approaches
 
-1. **Convergence Zone Validation**: A testable criterion for α calibration based on P05 WAL convergence across rate regimes
-2. **Dual-Sensitivity Framework**: Integrates both rate sensitivity and credit sensitivity (FHLB-SOFR spread)
-3. **Parameter Dominance Finding**: Behavioral parameter uncertainty (±2 years WAL) dwarfs methodological choice (0.13 years)
-4. **Surge Deposit Dynamics**: Captures transitory balances accumulated during low-rate periods without explicit cohort tracking
+1. **Traditional Bifurcation Model** — Static allocation into stable/nonstable categories with sensitivity analysis across 0%–40% nonstable allocations
+2. **Analytical Closed-Form Approximation** — Lognormal deposit evolution using market-implied volatility and integrated variance calculations
+3. **Monte Carlo Simulation** — 5,000-path simulation with path-dependent customer behavioral dynamics and balance-sensitive rate sensitivity feedback loops
 
-### Core Model Equation
+### Key Research Contributions
 
+1. **Analytical Model Systematic Bias**: The analytical approximation overestimates weighted average life (WAL) by **14.8%** relative to Monte Carlo, despite incorporating market-implied volatility — revealing fundamental limitations of closed-form approaches in capturing behavioral feedback loops
+2. **Embedded Optionality Quantification**: Monte Carlo captures **7× to 174×** more embedded customer optionality than analytical approximations, with the differential increasing dramatically at longer horizons
+3. **Bifurcation Calibration Insight**: Monte Carlo WAL corresponds to approximately **3.2% nonstable allocation**, substantially lower than the 20% commonly assumed in practice
+4. **Path-Dependent Behavioral Feedback**: Customers experiencing early adverse rate scenarios exhibit higher subsequent outflow propensities — a positive feedback loop that static models cannot represent
+
+### Core Model Equations
+
+**Hull-White Stochastic Rate Model:**
 ```
-B(t+1) = B(t) × (1-h) × exp[g - β_rate × r(t) - β_credit × s(t)]
+dr_t = κ(θ_t - r_t)dt + σ(t)dW_t
+```
+
+**Component Decay Model:**
+```
+B(t+1) = B(t) × (1 - h) × exp[g - β(B) × (r_t + credit_spread)]
 
 where:
-  β_rate = β_rate_0 × (B/B_0)^γ_rate × [1 + α × max(0, r - r_MA)]
+  β(B) = β_base × (1 + γ × ln(B / B₀))
 ```
+
+Balance-sensitive β reflects empirical observations that larger depositors exhibit higher rate awareness and lower switching costs, creating nonlinear relationships between account characteristics and behavioral responses.
 
 ---
 
@@ -45,24 +59,17 @@ git clone https://github.com/chihchen22/nmd-regime-aware-model.git
 cd nmd-regime-aware-model
 
 # Install dependencies
-pip install numpy pandas scipy matplotlib openpyxl
+pip install numpy pandas scipy matplotlib
 ```
 
 ### Running the Model
 
 ```bash
-# Run all analyses with default parameters (α=2.0, MA=24 months)
-python nmd_master.py
-
-# Run specific module
-python nmd_master.py --module sensitivity_2d
-
-# Custom parameters
-python nmd_master.py --alpha 1.5 --ma-window 12
-
-# List available modules
-python nmd_master.py --list
+# Run the comprehensive framework (reproduces all paper results)
+python nmd_comprehensive_framework.py
 ```
+
+This generates all CSV outputs used in the paper, including volatility surface data, simulated rate paths, balance evolution profiles, bifurcation sensitivity results, and analytical approximation comparisons.
 
 ---
 
@@ -71,33 +78,31 @@ python nmd_master.py --list
 ```
 nmd-regime-aware-model/
 │
-├── README.md                         # This file
-├── LICENSE                           # MIT License
+├── README.md                              # This file
+├── LICENSE                                # MIT License
 │
-├── nmd_master.py                     # Master controller script (START HERE)
-├── config.py                         # Central parameter configuration
+├── nmd_comprehensive_framework.py         # Complete framework (START HERE)
+│                                          #   - Volatility surface construction
+│                                          #   - Hull-White calibration
+│                                          #   - Monte Carlo simulation
+│                                          #   - Component decay model
+│                                          #   - Bifurcation sensitivity analysis
+│                                          #   - Analytical approximation
+│                                          #   - CSV export
 │
-├── comprehensive_nmd_model.py        # Core NMD model (Hull-White + Component Decay)
-├── sensitivity_matrix_2d.py          # 2D sensitivity analysis (α × MA window)
-├── dual_period_alpha_sensitivity.py  # March 2022 vs September 2025 comparison
-├── regime_amplification_analysis.py  # Regime effects analysis
-├── parameter_sensitivity.py          # Behavioral parameter sensitivity
-├── validate_model.py                 # Model validation utilities
+├── chart_script.py                        # Visualization and figure generation
 │
-├── market_data_loader.py             # Market data extraction (SOFR curves)
-├── sabr_volatility.py                # SABR volatility calibration
+├── SOFR_Market_Data_20250930.xlsx         # Input: October 2025 market data
+├── SOFR_Market_Data_20220331.xlsx         # Input: March 2022 market data
+├── SOFR_History.xlsx                      # Input: Historical SOFR rates
 │
-├── SOFR_Market_Data_20250930.xlsx    # Input: September 2025 market data
-├── SOFR_Market_Data_20220331.xlsx    # Input: March 2022 market data
-├── SOFR_History.xlsx                 # Input: Historical SOFR rates
-│
-└── model_outputs/                    # Generated outputs (CSV + PNG)
-    ├── 01_bootstrapped_curve.csv
-    ├── 02_forward_rates.csv
-    ├── ...
-    ├── fig1_forward_curve.png
-    ├── fig2_total_balance_comparison.png
-    └── ...
+└── Output CSVs (generated):
+    ├── volatility_surface_complete.csv    # Full extended volatility surface
+    ├── sofr_paths_simulation.csv          # Simulated SOFR rate paths
+    ├── balance_paths_simulation.csv       # Monte Carlo balance evolution
+    ├── bifurcation_profiles_detailed.csv  # Bifurcation allocation profiles
+    ├── bifurcation_sensitivity_analysis.csv  # WAL by nonstable %
+    └── analytical_approximation_results.csv  # Analytical vs MC comparison
 ```
 
 ---
@@ -106,77 +111,98 @@ nmd-regime-aware-model/
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| **α (alpha)** | 2.0 | Regime amplification factor |
-| **MA Window** | 24 months | Moving average lookback for regime detection |
-| β_rate_0 | 0.30 | Base rate sensitivity |
-| β_credit_0 | 0.15 | Base credit sensitivity |
-| γ_rate | 0.30 | Rate sensitivity elasticity (balance scaling) |
-| γ_credit | 0.40 | Credit sensitivity elasticity |
-| h | 0.01 | Monthly closure rate (~12% annual) |
+| h | 0.01 | Monthly account closure rate (~12% annual) |
 | g | 0.0017 | Monthly organic growth (~2% annual) |
+| β_base | 0.20 | Base rate sensitivity |
+| γ | 0.50 | Balance scaling factor for rate sensitivity |
+| κ | 0.025 | Hull-White mean reversion speed |
+| credit_spread | varies | FHLB-SOFR credit spread |
 | n_paths | 5,000 | Monte Carlo simulation paths |
 | n_months | 360 | Projection horizon (30 years) |
+
+### Volatility Surface Calibration
+
+| Maturity | ATM Volatility (bp) | Description |
+|----------|---------------------|-------------|
+| 1 month | 117 | Extrapolated short-term policy uncertainty |
+| 1 year | 87 | Market-observed (Tullett Prebon) |
+| 5 years | 52 | Market-observed |
+| 10 years | 42 | Market-observed |
+| 20 years | 33 | Market-observed |
+
+Market data: 11 strike levels (1.00%–7.00%) × 12 maturities (1Y–20Y), extended to 1M–360M through econometric extrapolation.
 
 ---
 
 ## Key Results
 
-### Dual-Period Validation (Table 2 in Paper)
+### Weighted Average Life Comparison
 
-| Metric | March 2022 (Transition) | September 2025 (Stable) |
-|--------|-------------------------|-------------------------|
-| Mean WAL | 4.61 years | 4.85 years |
-| P05 Stable WAL | 3.09 years | 4.02 years |
-| Mean - P05 Gap | 1.52 years | 0.85 years |
-| **Tail Risk Compression** | — | **44%** |
+| Methodology | WAL (years) | vs Monte Carlo |
+|-------------|-------------|----------------|
+| Deterministic (Market-Implied Forward) | 6.09 | +3.2% |
+| **Monte Carlo Simulation** | **5.90** | **Benchmark** |
+| Analytical Approximation | 6.77 | +14.8% |
+| Calibrated Bifurcation (3.2% nonstable) | 5.90 | Match |
 
-### Parameter Sensitivity Ranking
+### Embedded Optionality (Expected − Stable Balance)
 
-| Rank | Parameter | WAL Impact |
-|------|-----------|------------|
-| 1 | Closure Rate (h) | ±1.25 years |
-| 2 | Rate Sensitivity (β_rate) | ±0.89 years |
-| 3 | Credit Sensitivity (β_credit) | ±0.49 years |
-| 4 | Methodological Choice | 0.13 years |
+| Horizon | Analytical | Monte Carlo | MC / Analytical Ratio |
+|---------|-----------|-------------|----------------------|
+| 1 Year | 0.0024 | 0.0169 | **7.0×** |
+| 2 Years | 0.0024 | 0.0340 | **14.3×** |
+| 5 Years | 0.0014 | 0.0521 | **36.5×** |
+| 10 Years | 0.0005 | 0.0379 | **79.8×** |
+| 20 Years | 0.0001 | 0.0180 | **173.9×** |
 
-**Key Finding**: Behavioral parameter uncertainty exceeds methodological choice by 10-15×.
+Monte Carlo optionality peaks around 5-year horizons before declining — reflecting the balance between accumulated behavioral uncertainty and natural deposit decay. The analytical approach shows monotonic decline, missing the complex dynamics that create optimal exercise opportunities at intermediate horizons.
+
+### Bifurcation Sensitivity Analysis
+
+| Nonstable Allocation | WAL (years) |
+|----------------------|-------------|
+| 0% | 6.09 |
+| 5% | 5.79 |
+| 10% | 5.48 |
+| 20% | 4.88 |
+| 30% | 4.27 |
+| 40% | 3.66 |
+
+**Key Finding**: The Monte Carlo WAL of 5.90 years maps to **~3.2% nonstable allocation** — far below the 20% commonly used in practice, suggesting traditional approaches may significantly underestimate deposit stability under current market conditions.
+
+### Early-Period Retention
+
+| Period | Deterministic | Analytical | Monte Carlo |
+|--------|---------------|-----------|-------------|
+| 6-Month | 90.7% | 91.0% | 90.5% |
+| 12-Month | 82.8% | 83.4% | 82.1% |
 
 ---
 
-## Analysis Modules
+## Methodology Highlights
 
-| Module | Script | Description |
-|--------|--------|-------------|
-| Base Model | `comprehensive_nmd_model.py` | Hull-White calibration, Monte Carlo simulation, WAL calculation |
-| 2D Sensitivity | `sensitivity_matrix_2d.py` | α × MA window grid analysis with heatmaps |
-| Dual Period | `dual_period_alpha_sensitivity.py` | March 2022 vs September 2025 comparison |
-| Regime Analysis | `regime_amplification_analysis.py` | Regime excursion effects |
-| Parameter Sensitivity | `parameter_sensitivity.py` | h, β_rate, β_credit tornado analysis |
+### Volatility Surface Construction
+- Complete SOFR cap/floor surface from Tullett Prebon (October 2025)
+- Short-term extrapolation using exponential decay: σ(T) = σ₁ᵧ + (σ₁ₘ − σ₁ᵧ) × e^(−λT)
+- Fixes "flat early decay" artifact present when volatility begins at 1-year maturity
+- Forward curve extends from current SOFR through market-implied forwards to 4.5% long-term equilibrium
 
----
+### Path-Dependent Behavioral Dynamics
+- **Behavioral feedback loops**: Declining balances reduce relationship stickiness, accelerating further decay
+- **American-style option analogy**: Customers continuously evaluate withdrawal options based on path-specific information
+- **Balance-sensitive β**: Rate sensitivity ranges from 5% floor (depleted accounts) to ~36% (full-balance accounts)
+- **Composition effects**: As rate-sensitive customers exit, remaining portfolio becomes progressively less sensitive
 
-## Output Files
+### Model Selection Guidance
 
-### Data (CSV)
-| File | Description |
-|------|-------------|
-| `06_wal_comparison.csv` | WAL by methodology (MC, Analytical, Bifurcation) |
-| `dual_period_regime_comparison.csv` | March 2022 vs September 2025 metrics |
-| `sensitivity_matrix_2d.csv` | Full α × MA sensitivity grid |
-| `parameter_sensitivity_results.csv` | Behavioral parameter impacts |
-| `balance_size_sensitivity.csv` | WAL by account size tier |
-| `spread_stress_results.csv` | Credit stress scenario analysis |
-
-### Figures (PNG)
-| File | Description |
-|------|-------------|
-| `fig1_forward_curve.png` | SOFR forward curve (September 2025) |
-| `fig1_march2022_forward_curve.png` | SOFR forward curve (March 2022) |
-| `fig2_total_balance_comparison.png` | Balance evolution by methodology |
-| `fig3_stable_balance_comparison.png` | P05 stable balance comparison |
-| `fig5_wal_decomposition.png` | WAL waterfall decomposition |
-| `sensitivity_heatmaps_by_period.png` | 2D sensitivity heatmaps |
-| `parameter_sensitivity_tornado.png` | Parameter impact ranking |
+| Application | Recommended Approach |
+|-------------|---------------------|
+| Daily risk reporting | Analytical (with MC calibration adjustment) |
+| Standard ALM analysis | Analytical or Bifurcation |
+| Stress testing (CCAR/DFAST) | Monte Carlo |
+| Deposit franchise valuation | Monte Carlo |
+| Strategic decision-making | Monte Carlo |
+| Regulatory capital assessment | Monte Carlo |
 
 ---
 
@@ -185,15 +211,14 @@ nmd-regime-aware-model/
 ```
 Python 3.8+
 numpy
-pandas  
+pandas
 scipy
 matplotlib
-openpyxl
 ```
 
 Install all dependencies:
 ```bash
-pip install numpy pandas scipy matplotlib openpyxl
+pip install numpy pandas scipy matplotlib
 ```
 
 ---
@@ -203,11 +228,11 @@ pip install numpy pandas scipy matplotlib openpyxl
 If you use this code or methodology in academic work, please cite:
 
 ```bibtex
-@article{chen2026bifurcation,
-  title={Beyond Static Bifurcation: A Regime-Aware Approach to Nonmaturity Deposit Modeling},
+@article{chen2026beyondstatic,
+  title={Beyond Static Assumptions: A Comprehensive Analysis of Nonmaturity Deposit Behavioral Modeling Using Market-Implied Volatility and Path-Dependent Simulation},
   author={Chen, Chih L.},
   year={2026},
-  note={Working Paper}
+  note={Working Paper, Available at SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5997414}
 }
 ```
 
@@ -215,7 +240,7 @@ If you use this code or methodology in academic work, please cite:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
